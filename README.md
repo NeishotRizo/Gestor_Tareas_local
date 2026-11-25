@@ -2,6 +2,12 @@
 
 A new Flutter project.
 
+Tecnologia de persistencia usada
+Usaré drift y drift_flutter para una base de datos Sqlite local.
+Vi que esta tecnologia soporta multiplataforma para web, escritorio y movil, entre otras.
+
+drift es para las operaciones CRUD, las consultas asincras y la interaccion entre dart y SQLite
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
@@ -15,3 +21,5 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
