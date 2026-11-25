@@ -71,16 +71,75 @@ class _TareasPageState extends State<TareasPage> {
     }
   }
 
-  void _alternarCompletada(Tarea tarea, bool completada) {
-    _pendiente('Implementar actualización de tarea');
+  Future<void> _alternarCompletada(Tarea tarea, bool completada) async {
+    try {
+      await _db.cambiarEstado(tarea.id, completada);
+      await _cargarTareas();
+    } catch (e) {
+      if (!mounted) return;
+      _pendiente('Error al actualizar la tarea');
+    }
   }
 
-  void _editarTarea(Tarea tarea) {
-    _pendiente('Implementar edición de título');
+  Future<void> _editarTarea(Tarea tarea) async {
+    String nuevoTitulo = tarea.titulo;
+
+    final resultado = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Editar tarea'),
+          content: TextFormField(
+            initialValue: tarea.titulo,
+            autofocus: true,
+            onChanged: (valor) {
+              nuevoTitulo = valor;
+            },
+            decoration: const InputDecoration(
+              labelText: 'Título de la tarea',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context, nuevoTitulo.trim());
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (!mounted || resultado == null) return;
+
+    if (resultado.isEmpty) {
+      _pendiente('El título no puede estar vacío');
+      return;
+    }
+
+    try {
+      await _db.editarTarea(tarea.id, resultado);
+      await _cargarTareas();
+    } catch (e) {
+      if (!mounted) return;
+      _pendiente('Error al editar la tarea');
+    }
   }
 
-  void _eliminarTarea(Tarea tarea) {
-    _pendiente('Implementar eliminación de tarea');
+  Future<void> _eliminarTarea(Tarea tarea) async {
+    try {
+      await _db.eliminarTarea(tarea.id);
+      await _cargarTareas();
+    } catch (e) {
+      if (!mounted) return;
+      _pendiente('Error al eliminar la tarea');
+    }
   }
 
   void _pendiente(String mensaje) {
