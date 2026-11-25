@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/tarea.dart';
+import '../data/database.dart';
 
 // Pantalla base SIN persistencia ni operaciones CRUD implementadas.
 // Conserva las indicaciones TODO para orientar tu trabajo.
@@ -15,14 +16,59 @@ class _TareasPageState extends State<TareasPage> {
   final TextEditingController _tituloController = TextEditingController();
 
   final List<Tarea> _tareas = [];
+  final AppDatabase _db = AppDatabase();
 
   @override
   void initState() {
     super.initState();
+    _cargarTareas();
   }
 
-  void _agregarTarea() {
-    _pendiente('Implementar registro de tarea');
+  Future<void> _cargarTareas() async {
+    try {
+      final registros = await _db.obtenerTareas();
+
+      if (!mounted) return;
+
+      setState(() {
+        _tareas.clear();
+
+        _tareas.addAll(
+          registros.map(
+            (registro) => Tarea(
+              id: registro.id,
+              titulo: registro.titulo,
+              completada: registro.completada,
+            ),
+          ),
+        );
+      });
+    } catch (e) {
+      if (!mounted) return;
+      _pendiente('Error al cargar las tareas');
+    }
+  }
+
+  Future<void> _agregarTarea() async {
+    final titulo = _tituloController.text.trim();
+
+    if (titulo.isEmpty) {
+      _pendiente('El título no puede estar vacío');
+      return;
+    }
+
+    try {
+      await _db.agregarTarea(titulo);
+
+      if (!mounted) return;
+
+      _tituloController.clear();
+
+      await _cargarTareas();
+    } catch (e) {
+      if (!mounted) return;
+      _pendiente('Error al guardar la tarea');
+    }
   }
 
   void _alternarCompletada(Tarea tarea, bool completada) {
@@ -45,6 +91,7 @@ class _TareasPageState extends State<TareasPage> {
   @override
   void dispose() {
     _tituloController.dispose();
+    _db.close();
     super.dispose();
   }
 
