@@ -8,6 +8,12 @@ Vi que esta tecnologia soporta multiplataforma para web, escritorio y movil, ent
 
 drift es para las operaciones CRUD, las consultas asincras y la interaccion entre dart y SQLite
 
+
+Escritorio: Crud y persistencia probados
+Chrome: Crud y persistencia probados
+movil: Crud y persistencia 
+
+cada app maneja su base de datos local entonces no se comparten
 ## Getting Started
 
 This project is a starting point for a Flutter application.

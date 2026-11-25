@@ -28,18 +28,28 @@ class AppDatabase extends _$AppDatabase {
   @override
   int get schemaVersion => 1;
 
+  AppDatabase.forTesting(QueryExecutor executor) : super(executor);
+
   // Consultar tareas
   Future<List<TareaDB>> obtenerTareas() {
     return select(tareas).get();
   }
 
   // Agregar tarea
-  Future<int> agregarTarea(String titulo) {
+  Future<int> agregarTarea(String titulo) async {
+    if (titulo.trim().isEmpty) {
+      throw ArgumentError('El título no puede estar vacío');
+    }
+
     return into(tareas).insert(TareasCompanion.insert(titulo: titulo.trim()));
   }
 
   // Editar tarea
-  Future<int> editarTarea(int id, String titulo) {
+  Future<int> editarTarea(int id, String titulo) async {
+    if (titulo.trim().isEmpty) {
+      throw ArgumentError('El título no puede estar vacío');
+    }
+
     return (update(tareas)..where((t) => t.id.equals(id))).write(
       TareasCompanion(titulo: Value(titulo.trim())),
     );
